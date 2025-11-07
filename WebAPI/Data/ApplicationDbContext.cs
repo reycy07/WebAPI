@@ -1,0 +1,19 @@
+﻿using Microsoft.EntityFrameworkCore;
+using WebAPI.Entities;
+
+namespace WebAPI.Data
+{
+    public class ApplicationDbContext : DbContext
+    {
+        public ApplicationDbContext(DbContextOptions options) : base(options)
+        {
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // modificador de la base de datos 
+            base.OnModelCreating(modelBuilder);
+        }
+        public  DbSet<Author> Authors { get; set; }
+        public DbSet<Book> Books { get; set; }
+    }
+}
