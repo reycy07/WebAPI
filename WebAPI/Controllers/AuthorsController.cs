@@ -50,6 +50,7 @@ namespace WebAPI.Controllers
             {
             var author = await context.Authors
                 .Include(x => x.Books )
+                    .ThenInclude(x => x.Book)
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (author is null)
             {
@@ -78,7 +79,7 @@ namespace WebAPI.Controllers
                 return BadRequest();
             }
 
-            var authorDB = context.Authors.FirstOrDefaultAsync(x => x.Id == id);
+            var authorDB = await context.Authors.FirstOrDefaultAsync(x => x.Id == id);
 
 
             if (authorDB is null)

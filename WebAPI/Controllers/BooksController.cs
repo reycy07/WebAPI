@@ -24,7 +24,7 @@ namespace WebAPI.Controllers
         public async Task<IEnumerable<BookDTO>> Get()
         {
             var books = await context.Books
-                .Include(x => x.Author)
+                .Include(x => x.Authors)
                 .ToListAsync();
 
             var booksDTO = mapper.Map<IEnumerable<BookDTO>>(books);
@@ -32,50 +32,93 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("{id:int}", Name ="GetBook")]
-        public async Task<ActionResult<BookWithAuthorDTO>> Get(int id)
+        public async Task<ActionResult<BookWithAuthorsDTO>> Get(int id)
         {
             var book = await context.Books
-                .Include(x => x.Author)
+                .Include(x => x.Authors)
+                .ThenInclude(x => x.Author)
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (book is null)
             {
                 return NotFound();
             }
-            var bookDTO = mapper.Map<BookWithAuthorDTO>(book);
+            var bookDTO = mapper.Map<BookWithAuthorsDTO>(book);
             return bookDTO;
         }
 
         [HttpPost]
         public async Task<ActionResult> Post(BookCreateDTO bookCreateDTO)
         {
-            var authorExist = await context.Authors.AnyAsync(x => x.Id == bookCreateDTO.AuthorId);
-            if (!authorExist)
+           
+            if (bookCreateDTO.AuthorsIds is null || bookCreateDTO.AuthorsIds.Count == 0)
             {
-                ModelState.AddModelError(nameof(BookCreateDTO.AuthorId), $"El autor de i {bookCreateDTO.AuthorId} no existe");
+                ModelState.AddModelError(nameof(BookCreateDTO.AuthorsIds), $"No se puede crear un libro sin autores");
                 return ValidationProblem();
             }
+
+            var authorsExist = await context.Authors
+                                .Where(x => bookCreateDTO.AuthorsIds.Contains(x.Id))
+                                .Select(x => x.Id)
+                                .ToListAsync();
+
+            if (authorsExist.Count != bookCreateDTO.AuthorsIds.Count)
+            {
+                var authorsNoExist = bookCreateDTO.AuthorsIds.Except(authorsExist);
+                var authorsNoExsitString = string.Join(",", authorsNoExist);
+                var errorMessage = $"Los siguientes autores no exsiten: {authorsNoExsitString}";
+
+                ModelState.AddModelError(nameof(bookCreateDTO.AuthorsIds), errorMessage);
+                return ValidationProblem();
+            }
+
             var book = mapper.Map<Book>(bookCreateDTO);
+            AssignAuthorOrder(book);
+
             context.Books.Add(book);
             await context.SaveChangesAsync();
             var bookDTO = mapper.Map<BookDTO>(book);
 
+            return CreatedAtRoute("GetBook", new { id = book.Id }, bookDTO);
+        }
 
-            return CreatedAtRoute("GetBook", new {id = book.Id }, bookDTO);
-
+        private void AssignAuthorOrder(Book book)
+        {
+            if(book.Authors is not null)
+            {
+                for (int i =0; i < book.Authors.Count; i++)
+                {
+                    book.Authors[i].Order = i;
+                }
+            }
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> Put(int id, BookCreateDTO bookDTO)
+        public async Task<ActionResult> Put(int id, BookCreateDTO bookCreateDTO)
         {
-            var authorExist = await context.Authors.AnyAsync(x => x.Id == bookDTO.AuthorId);
-            if (!authorExist)
+            var authorsExist = await context.Authors
+                .Where(x => bookCreateDTO.AuthorsIds.Contains(x.Id))
+                .Select(x => x.Id)
+                .ToListAsync();
+
+            if (authorsExist.Count != bookCreateDTO.AuthorsIds.Count)
             {
-                return BadRequest($"El autor de id {bookDTO.AuthorId} no existe");
+                var authorsNoExist = bookCreateDTO.AuthorsIds.Except(authorsExist);
+                var authorsNoExsitString = string.Join(",", authorsNoExist);
+                var errorMessage = $"Los siguientes autores no exsiten: {authorsNoExsitString}";
+
+                ModelState.AddModelError(nameof(bookCreateDTO.AuthorsIds), errorMessage);
+                return ValidationProblem();
             }
-            var book = mapper.Map<Book>(bookDTO);
-            book.Id = id;
-            Console.WriteLine(book.AuthorId);
-            context.Update(book);
+            
+            var bookDB = await context.Books
+                        .Include(x => x.Authors)
+                        .FirstOrDefaultAsync(x=>x.Id == id);
+
+            if (bookDB is null) return NotFound();
+
+            bookDB = mapper.Map(bookCreateDTO, bookDB);
+            AssignAuthorOrder(bookDB);
+
             await context.SaveChangesAsync();
             return NoContent();
         }

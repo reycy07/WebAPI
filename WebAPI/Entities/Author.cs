@@ -19,7 +19,7 @@ namespace WebAPI.Entities
         [StringLength(20, ErrorMessage = "{0} filed should be {1} caracthers or less")]
         public string? Identification { get; set; }
 
-        public List<Book> Books { get; set; } = new List<Book>();
+        public List<AuthorBook> Books { get; set; } = [];
 
     }
 }

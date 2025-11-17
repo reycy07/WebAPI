@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAPI.Data;
 
@@ -11,9 +12,11 @@ using WebAPI.Data;
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251107143148_CommentsTable")]
+    partial class CommentsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,24 +52,6 @@ namespace WebAPI.Migrations
                     b.ToTable("Authors");
                 });
 
-            modelBuilder.Entity("WebAPI.Entities.AuthorBook", b =>
-                {
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BookId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.HasKey("AuthorId", "BookId");
-
-                    b.HasIndex("BookId");
-
-                    b.ToTable("AuthorsBooks");
-                });
-
             modelBuilder.Entity("WebAPI.Entities.Book", b =>
                 {
                     b.Property<int>("Id")
@@ -75,12 +60,17 @@ namespace WebAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
 
                     b.ToTable("Books");
                 });
@@ -108,7 +98,7 @@ namespace WebAPI.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("WebAPI.Entities.AuthorBook", b =>
+            modelBuilder.Entity("WebAPI.Entities.Book", b =>
                 {
                     b.HasOne("WebAPI.Entities.Author", "Author")
                         .WithMany("Books")
@@ -116,15 +106,7 @@ namespace WebAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebAPI.Entities.Book", "Book")
-                        .WithMany("Authors")
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Author");
-
-                    b.Navigation("Book");
                 });
 
             modelBuilder.Entity("WebAPI.Entities.Comment", b =>
@@ -145,8 +127,6 @@ namespace WebAPI.Migrations
 
             modelBuilder.Entity("WebAPI.Entities.Book", b =>
                 {
-                    b.Navigation("Authors");
-
                     b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618

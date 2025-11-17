@@ -7,6 +7,6 @@ namespace WebAPI.DTOs
         [Required]
         [StringLength(250, ErrorMessage = "El campo {0} debe tener {1 caracteres o menos}")]
         public required string Title { get; set; }
-        public int AuthorId { get; set; }
+        public List<int> AuthorsIds { get; set; } = [];
     }
 }

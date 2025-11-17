@@ -13,7 +13,9 @@ namespace WebAPI.Data
             // modificador de la base de datos 
             base.OnModelCreating(modelBuilder);
         }
-        public  DbSet<Author> Authors { get; set; }
+        public DbSet<Author> Authors { get; set; }
         public DbSet<Book> Books { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<AuthorBook> AuthorsBooks{ get; set; }
     }
 }
