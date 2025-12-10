@@ -17,6 +17,8 @@ namespace WebAPI.Utilities
                 config => config.MapFrom(author => MappFullName(author)));
 
             CreateMap<AuthorCreateDTO, Author>();
+            CreateMap<AuthorCreateWithPictureDTO, Author>().
+                ForMember(ent => ent.Picture, config => config.Ignore());
             CreateMap<AuthorBook, BookDTO>()
                 .ForMember(dto => dto.Id, config => config.MapFrom(ent => ent.BookId))
                 .ForMember(dto => dto.Title, config => config.MapFrom(ent => ent.Book!.Title));
@@ -29,16 +31,20 @@ namespace WebAPI.Utilities
 
             CreateMap<Book, BookWithAuthorsDTO>();
 
-            CreateMap<BookCreateDTO, AuthorBook>()
-                .ForMember(ent => ent.Book, config => config.MapFrom(dto => new Book { Title = dto.Title }));
-
             CreateMap<AuthorBook, AuthorDTO>()
                 .ForMember(dto => dto.Id, config => config.MapFrom(ent => ent.AuthorId))
                 .ForMember(dto => dto.FullName, config => config.MapFrom(ent => MappFullName(ent.Author!)));
 
+            
+            CreateMap<BookCreateDTO, AuthorBook>()
+                .ForMember(ent => ent.Book, config => config.MapFrom(dto => new Book { Title = dto.Title }));
+
             CreateMap<CommentCreateDTO, Comment>();
-            CreateMap<Comment, CommentDTO>();
+            CreateMap<Comment, CommentDTO>()
+                .ForMember(dto => dto.UserEmail, config => config.MapFrom(ent => ent.User!.Email));
             CreateMap<CommentPatchDTO, Comment>().ReverseMap();
+
+            CreateMap<User, UserDTO>();
 
 
         }

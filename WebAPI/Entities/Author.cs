@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using WebAPI.Validations;
 
 namespace WebAPI.Entities
@@ -18,7 +19,8 @@ namespace WebAPI.Entities
 
         [StringLength(20, ErrorMessage = "{0} filed should be {1} caracthers or less")]
         public string? Identification { get; set; }
-
+        [Unicode(false)]
+        public string? Picture { get; set; }
         public List<AuthorBook> Books { get; set; } = [];
 
     }

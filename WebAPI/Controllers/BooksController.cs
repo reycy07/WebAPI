@@ -1,37 +1,47 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.DTOs;
 using WebAPI.Entities;
+using WebAPI.Utilities;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
     [Route("api/books")]
-    public class BooksControllerL : ControllerBase
+    [Authorize]
+    [Authorize(Policy = "isAdmin")]
+    public class BooksController : ControllerBase
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
 
-        public BooksControllerL(ApplicationDbContext context, IMapper mapper)
+        public BooksController(ApplicationDbContext context, IMapper mapper)
         {
             this.context = context;
             this.mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<BookDTO>> Get()
+        [AllowAnonymous]
+        public async Task<IEnumerable<BookDTO>> Get([FromQuery] PaginationDTO paginationDTO)
         {
-            var books = await context.Books
-                .Include(x => x.Authors)
-                .ToListAsync();
+            var queryable = context.Books.AsQueryable();
+            await HttpContext.InsertPaginationParamsInHeader(queryable);
+            var books = await queryable
+                    .OrderBy(x => x.Id)
+                    .Paginate(paginationDTO)
+                    .ToListAsync();
 
             var booksDTO = mapper.Map<IEnumerable<BookDTO>>(books);
             return booksDTO;
         }
 
         [HttpGet("{id:int}", Name ="GetBook")]
+        [AllowAnonymous]
         public async Task<ActionResult<BookWithAuthorsDTO>> Get(int id)
         {
             var book = await context.Books

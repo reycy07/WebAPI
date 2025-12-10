@@ -9,5 +9,7 @@ namespace WebAPI.DTOs
         public DateTime PublishDate { get; set; }
 
         public int BookId { get; set; }
+        public required string UserId { get; set; }
+        public required string UserEmail { get; set; }
     }
 }
