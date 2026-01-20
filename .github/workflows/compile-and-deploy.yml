@@ -1,0 +1,39 @@
+name: Compile and Deploy
+
+
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths: 
+      - 'WebAPI/**'
+      - 'WebApiTest/**'
+      - '.github/workflows/compile-and-deploy.yml'
+env:
+  DOTNET_VERSION: '9'
+
+jobs:
+  Build:
+    runs-on: ubuntu-lastes
+    env:
+      project: WebAPI/WebAPI.csproj
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Instalar .NET
+        uses: actions/setup-donet@v4.3.0
+        with:
+          dotnet-version: ${{env.DOTNET_VERSION}}
+
+      - name: Obteniendo la dependencias
+        run: dotnet restore
+
+      - name: Compilar
+        run: dotnet build --no-restore
+        
+      - name: Realizar Pruebas
+        run:  dotnet test --no-build
+        
+      
