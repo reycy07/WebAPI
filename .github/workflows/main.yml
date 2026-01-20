@@ -2,17 +2,17 @@ name: Hola mundo
 
 on: 
   workflow_dispatch: #ejecución manul
-  push:
-    branches:
-      - main
-    paths:
-      - 'WebAPI/**'
-      - 'WebApiTest/**'
-      - '.github/workflows/hola-mundo.yml'
+  #push:
+    #branches:
+      #- main
+    #paths:
+      #- 'WebAPI/**'
+      #- 'WebApiTest/**'
+      #- '.github/workflows/hola-mundo.yml'
 
-  pull_request:
-    branches:
-      - main
+  #pull_request:
+    #branches:
+      #- main
 jobs: 
   saludar:
     runs-on: ubuntu-latest
