@@ -8,7 +8,7 @@ on:
     paths:
       - 'WebAPI/**'
       - 'WebApiTest/**'
-      - '.github/workflows/hola-mundo.yml
+      - '.github/workflows/hola-mundo.yml'
 
   pull_request:
     branches:
