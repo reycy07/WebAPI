@@ -12,6 +12,8 @@ namespace WebAPI.Entities
         public int BookId { get; set; }
         public Book? Book { get; set; }
         public required string UserId { get; set; }
+
+        public bool IsDeleted { get; set; }
         public User? User { get; set; }
     }
 }

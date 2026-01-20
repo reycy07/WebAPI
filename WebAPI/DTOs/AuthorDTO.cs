@@ -2,7 +2,7 @@
 
 namespace WebAPI.DTOs
 {
-    public class AuthorDTO
+    public class AuthorDTO: ResourceDTO
     {
         public int Id { get; set; }
         public required string FullName { get; set; }
