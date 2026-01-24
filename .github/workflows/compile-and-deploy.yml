@@ -14,7 +14,7 @@ env:
   DOTNET_VERSION: '9'
 
 jobs:
-  Build:
+  build:
     runs-on: ubuntu-lastes
     env:
       project: WebAPI/WebAPI.csproj
