@@ -101,7 +101,7 @@ builder.Services.AddSwaggerGen(options =>
     options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
         Version = "V1",
-        Title = "Library API",
+        Title = "Library API - Hi from Github Actions",
         Description = "Este es una web api para trabajar con datos de autores y libros",
         Contact = new Microsoft.OpenApi.Models.OpenApiContact
         {
