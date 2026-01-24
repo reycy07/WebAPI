@@ -12,6 +12,8 @@ on:
       - '.github/workflows/compile-and-deploy.yml'
 env:
   DOTNET_VERSION: '9'
+  AZURE_APP_SERVICE_NAME: WebAPI20260118235245
+  AZURE_APP_SERVICE_LOCATION_PACKAGE: '.'
 
 jobs:
   build:
@@ -36,4 +38,29 @@ jobs:
       - name: Realizar Pruebas
         run:  dotnet test --no-build
         
-      
+      - name: Public WebApi
+        run: dotnet publish $project -c Release --runtime win-x86
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v6.0.0
+        with:
+          path: ./myapp
+          name: build
+  deploy:
+    permissions: 
+      contents: none
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Get Artifacts
+        uses: actions/download-artifact@v7.0.0
+        with:
+          name: build
+
+      - name: Deployment Azure Web Service
+        uses: Azure/webapps-deploy@v2.2.17
+        with:
+          app-name: ${{ env.AZURE_APP_SERVICE_NAME }}
+          publish-profile: ${{ secrets.AZURE_PUBLIC_PROFILE }}
+          package: ${{ env.AZURE_APP_SERVICE_LOCATION_PACKAGE }}
+  
