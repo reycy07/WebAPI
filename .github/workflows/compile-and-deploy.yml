@@ -39,7 +39,7 @@ jobs:
         run:  dotnet test --no-build
         
       - name: Public WebApi
-        run: dotnet publish $project -c Release --runtime win-x86
+        run: dotnet publish $project -c Release -o myapp --runtime win-x86
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v6.0.0
